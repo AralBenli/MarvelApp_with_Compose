@@ -11,13 +11,11 @@ import retrofit2.http.Query
 interface MarvelApi {
     @GET("characters")
     fun getCharacters(
-        @Query("nameStartWith") name: String
-    ): Call<CharactersApiResponse>
+        @Query("nameStartsWith"
+        ) name: String):
+            Call<CharactersApiResponse>
 
 
-    @GET("characters/{characterId}")
-    fun getCharacterDetail(
-        @Query("characterId") characterId: Int
-    ): Call<CharactersApiResponse>
+
 
 }

@@ -3,6 +3,7 @@ package com.aral.marvelcomicscompose
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -19,6 +20,8 @@ import com.aral.marvelcomicscompose.view.CharacterDetailScreen
 import com.aral.marvelcomicscompose.view.CharactersBottomNav
 import com.aral.marvelcomicscompose.view.CollectionScreen
 import com.aral.marvelcomicscompose.view.LibraryScreen
+import com.aral.marvelcomicscompose.viewmodel.LibraryViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 
 sealed class Destination(val route : String){
@@ -30,7 +33,12 @@ sealed class Destination(val route : String){
 }
 
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private val lvm by viewModels<LibraryViewModel>()
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -41,7 +49,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     val navController = rememberNavController()
-                    CharactersScaffold(navController = navController)
+                    CharactersScaffold(navController = navController , lvm)
                 }
             }
         }
@@ -49,7 +57,10 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun CharactersScaffold(navController: NavHostController) {
+fun CharactersScaffold(
+    navController: NavHostController,
+    lvm : LibraryViewModel
+) {
     val scaffoldState = rememberScaffoldState()
 
     Scaffold(
@@ -60,7 +71,7 @@ fun CharactersScaffold(navController: NavHostController) {
     ){ paddingValues ->
         NavHost(navController = navController, startDestination = Destination.Library.route ){
             composable(Destination.Library.route){
-                LibraryScreen()
+                LibraryScreen(navController,  lvm , paddingValues)
             }
             composable(Destination.Collection.route){
                 CollectionScreen()
