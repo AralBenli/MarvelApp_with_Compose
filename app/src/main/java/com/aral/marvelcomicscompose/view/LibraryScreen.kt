@@ -125,13 +125,12 @@ fun ShowCharacterList(
                         .padding(4.dp)
                         .wrapContentHeight()
                         .clickable {
-                            if (character.id != null) {
-                                navController.navigate(Destination.CharacterDetail.route)
-                            } else {
+                            if (character.id != null)
+                                navController.navigate(Destination.CharacterDetail.createRoute(id))
+                            else
                                 Toast
                                     .makeText(context, "Character id is null", Toast.LENGTH_SHORT)
                                     .show()
-                            }
                         }
                 ) {
                     Row(
