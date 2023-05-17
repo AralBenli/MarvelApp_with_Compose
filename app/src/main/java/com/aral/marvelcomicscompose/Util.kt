@@ -46,3 +46,4 @@ fun CharacterImage(
 }
 
 fun List<String>.comicsToString() = this.joinToString(separator = ", ")
+

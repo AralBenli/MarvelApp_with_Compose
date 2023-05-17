@@ -6,6 +6,7 @@ import com.aral.marvelcomicscompose.modal.CharacterResult
 import com.aral.marvelcomicscompose.modal.db.CollectionDbRepo
 import com.aral.marvelcomicscompose.modal.db.DbEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -36,7 +37,7 @@ class CollectionDbViewModel @Inject constructor(
 
     fun setCurrentCharacterId(characterId : Int?){
         characterId?.let {
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.IO) {
                 repo.getCharacterFromRepo(it).collect {
                     currentCharacter.value = it
                 }
@@ -45,13 +46,13 @@ class CollectionDbViewModel @Inject constructor(
     }
 
     fun addCharacter(character : CharacterResult){
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             repo.addCharacterToRepo(DbEntity.fromCharacter(character))
         }
     }
 
     fun deleteCharacter(character : DbEntity){
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             repo.deleteCharacterInRepo(character)
         }
     }

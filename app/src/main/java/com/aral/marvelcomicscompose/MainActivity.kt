@@ -22,6 +22,7 @@ import com.aral.marvelcomicscompose.view.CharacterDetailScreen
 import com.aral.marvelcomicscompose.view.CharactersBottomNav
 import com.aral.marvelcomicscompose.view.CollectionScreen
 import com.aral.marvelcomicscompose.view.LibraryScreen
+import com.aral.marvelcomicscompose.viewmodel.CollectionDbViewModel
 import com.aral.marvelcomicscompose.viewmodel.LibraryViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -39,7 +40,7 @@ sealed class Destination(val route: String) {
 class MainActivity : ComponentActivity() {
 
     private val lvm by viewModels<LibraryViewModel>()
-
+    private val cvm by viewModels<CollectionDbViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,7 +52,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     val navController = rememberNavController()
-                    CharactersScaffold(navController = navController, lvm)
+                    CharactersScaffold(navController = navController, lvm , cvm)
                 }
             }
         }
@@ -61,7 +62,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun CharactersScaffold(
     navController: NavHostController,
-    lvm: LibraryViewModel
+    lvm: LibraryViewModel,
+    cvm : CollectionDbViewModel
 ) {
     val scaffoldState = rememberScaffoldState()
     val context = LocalContext.current
@@ -77,7 +79,7 @@ fun CharactersScaffold(
                 LibraryScreen(navController, lvm, paddingValues)
             }
             composable(Destination.Collection.route) {
-                CollectionScreen()
+                CollectionScreen(cvm , navController)
             }
             composable(Destination.CharacterDetail.route) { navBackStackEntry ->
                 val id = navBackStackEntry.arguments?.getString("characterId")?.toIntOrNull()
@@ -88,7 +90,8 @@ fun CharactersScaffold(
                     CharacterDetailScreen(
                         lvm = lvm,
                         paddingValues = paddingValues,
-                        navController = navController
+                        navController = navController,
+                        cvm = cvm
                     )
                 }
             }

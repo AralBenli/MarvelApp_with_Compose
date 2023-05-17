@@ -13,7 +13,11 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
@@ -24,6 +28,7 @@ import androidx.navigation.NavHostController
 import com.aral.marvelcomicscompose.CharacterImage
 import com.aral.marvelcomicscompose.Destination
 import com.aral.marvelcomicscompose.comicsToString
+import com.aral.marvelcomicscompose.viewmodel.CollectionDbViewModel
 import com.aral.marvelcomicscompose.viewmodel.LibraryViewModel
 
 /**
@@ -33,16 +38,23 @@ import com.aral.marvelcomicscompose.viewmodel.LibraryViewModel
 @Composable
 fun CharacterDetailScreen(
     lvm: LibraryViewModel,
+    cvm : CollectionDbViewModel,
     paddingValues: PaddingValues,
     navController: NavHostController
 ) {
     val character = lvm.characterDetails.value
+    val collection by cvm.collection.collectAsState()
+    val inCollection =  collection.map { it.apiId }.contains(character?.id)
 
     if (character == null) {
         navController.navigate(Destination.Library.route) {
             popUpTo(Destination.Library.route)
             launchSingleTop = true
         }
+    }
+
+    LaunchedEffect(key1 = Unit){
+        cvm.setCurrentCharacterId(character?.id)
     }
 
     Column(
@@ -82,13 +94,27 @@ fun CharacterDetailScreen(
 
         Text(text = description, fontSize = 16.sp, modifier = Modifier.padding(4.dp))
 
-        Button(onClick = { }, modifier = Modifier.padding(bottom = 20.dp)) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(Icons.Default.Add, contentDescription = null)
-                Text(text = "Add to Collection")
+        Button(onClick = {
+                         if (!inCollection && character != null){
+                             cvm.addCharacter(character)
+                         }
+        }, modifier = Modifier.padding(bottom = 20.dp)) {
+            if (!inCollection) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = null)
+                    Text(text = "Add to Collection")
+                }
+            }else{
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Default.Check, contentDescription = null)
+                    Text(text = "Added")
+                }
             }
         }
     }
